@@ -1,18 +1,23 @@
 @import "tailwindcss";
 
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  width: 100%;
-  min-height: 100%;
 }
 
 body {
-  font-family: system-ui, sans-serif;
+  background: black;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
 }

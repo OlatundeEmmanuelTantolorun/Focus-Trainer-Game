@@ -1,0 +1,13 @@
+export const BALL_SIZE = 120;
+export const INITIAL_X = 100;
+export const INITIAL_Y = 100;
+export const INITIAL_VX = 4;
+export const INITIAL_VY = 4;
+export const INITIAL_REVEAL_TIME = 50;
+export const MIN_REVEAL_TIME = 6;
+export const TIME_DECREMENT = 2;
+export const SPEED_MULTIPLIER = 1.15;
+export const HIGH_SCORE_KEY = "focus_high_score";
+export const POOL_SIZE = 6;
+export const BOUNCE_MIN_INTERVAL = 40;
+export const COLOR_CHANGE_INTERVAL = 500;

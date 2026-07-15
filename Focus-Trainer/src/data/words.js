@@ -39,4 +39,5 @@ export const WORDS = [
   "TRACKING",
   "DECISION",
   "ACCURACY",
+  "TAILWIND",
 ];

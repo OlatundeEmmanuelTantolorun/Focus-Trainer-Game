@@ -35,9 +35,11 @@ export const GameProvider = ({ children }) => {
   const [showBanner, setShowBanner] = useState(false);
 
   const { highScore, updateHighScore } = useLocalStorage();
-  const playBounceSound = useAudioPool();
+  const playBounceSound = useAudioPool(); // Get the sound function
+
+  // Pass the sound function to useBallMovement
   const { position, color, shadow, increaseSpeed, resetBall, setVelocity } =
-    useBallMovement(isGameStarted);
+    useBallMovement(isGameStarted, playBounceSound);
 
   const onTimeComplete = useCallback(() => {
     restartGame();
@@ -124,7 +126,6 @@ export const GameProvider = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      // Game state
       score,
       highScore,
       currentWord,
@@ -136,7 +137,6 @@ export const GameProvider = ({ children }) => {
       shadow,
       isCelebrating,
       showBanner,
-      // Game actions
       startGame,
       restartGame,
       checkAnswer,

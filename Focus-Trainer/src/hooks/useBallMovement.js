@@ -9,13 +9,14 @@ import {
 } from "../utils/constants";
 import { randomRGB } from "../utils/randomColor";
 
-export const useBallMovement = (isGameStarted) => {
+export const useBallMovement = (isGameStarted, playBounceSound) => {
   const [position, setPosition] = useState({ x: INITIAL_X, y: INITIAL_Y });
   const [velocity, setVelocity] = useState({ vx: INITIAL_VX, vy: INITIAL_VY });
   const [color, setColor] = useState("rgb(201, 242, 155)");
   const [shadow, setShadow] = useState("0 0 30px rgba(201, 242, 155, 0.6)");
   const animationRef = useRef(null);
   const lastColorChangeRef = useRef(0);
+  const lastBounceRef = useRef(0);
 
   const moveBall = useCallback(() => {
     if (!isGameStarted) return;
@@ -28,7 +29,7 @@ export const useBallMovement = (isGameStarted) => {
       let bounced = false;
 
       const maxX = window.innerWidth - BALL_SIZE;
-      const maxY = window.innerHeight - BALL_SIZE;
+      const maxY = window.innerHeight - BALL_SIZE - 180; // Account for UI
 
       if (newX <= 0) {
         newX = 0;
@@ -40,8 +41,9 @@ export const useBallMovement = (isGameStarted) => {
         newVx *= -1;
         bounced = true;
       }
-      if (newY <= 0) {
-        newY = 0;
+      if (newY <= 60) {
+        // Account for navbar
+        newY = 60;
         newVy *= -1;
         bounced = true;
       }
@@ -53,6 +55,16 @@ export const useBallMovement = (isGameStarted) => {
 
       if (bounced) {
         setVelocity({ vx: newVx, vy: newVy });
+
+        // Play sound on bounce
+        if (playBounceSound) {
+          const now = performance.now();
+          // Prevent too many sounds in quick succession
+          if (now - lastBounceRef.current > 50) {
+            playBounceSound(newVx, newVy);
+            lastBounceRef.current = now;
+          }
+        }
       }
 
       const now = performance.now();
@@ -67,7 +79,7 @@ export const useBallMovement = (isGameStarted) => {
     });
 
     animationRef.current = requestAnimationFrame(moveBall);
-  }, [isGameStarted, velocity]);
+  }, [isGameStarted, velocity, playBounceSound]);
 
   useEffect(() => {
     if (isGameStarted) {

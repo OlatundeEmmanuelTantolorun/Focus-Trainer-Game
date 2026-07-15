@@ -1,36 +1,37 @@
 import React from "react";
 import { GameProvider } from "../context/GameContext";
-import { ThemeProvider } from "../context/ThemeContext";
-import Ball from "../components/ui/Ball";
-import ScoreDisplay from "../components/ui/ScoreDisplay";
-import TimerDisplay from "../components/ui/TimerDisplay";
-import CelebrationBanner from "../components/ui/CelebrationBanner";
+import GameLayout from "../components/layout/GameLayout";
+import Arena from "../components/game/Arena";
+import ScoreBoard from "../components/game/ScoreBoard";
+import Timer from "../components/game/Timer";
+import AnswerInput from "../components/game/AnswerInput";
+import Controls from "../components/game/Controls";
+import Celebration from "../components/game/Celebration";
 import StartScreen from "../components/ui/StartScreen";
-import InputControls from "../components/ui/InputControls";
-import { useAnimation } from "../hooks/useAnimation";
+import Navbar from "../components/layout/Navbar";
 
 const HomeContent = () => {
-  const { isVibrating } = useAnimation();
-
   return (
-    <>
-      <ScoreDisplay />
-      <TimerDisplay />
-      <CelebrationBanner />
-      <Ball isVibrating={isVibrating} />
-      <InputControls />
-      <StartScreen />
-    </>
+    <div className="home-page">
+      <Navbar />
+      <GameLayout>
+        <ScoreBoard />
+        <Timer />
+        <Arena />
+        <AnswerInput />
+        <Controls />
+        <Celebration />
+        <StartScreen />
+      </GameLayout>
+    </div>
   );
 };
 
 const Home = () => {
   return (
-    <ThemeProvider>
-      <GameProvider>
-        <HomeContent />
-      </GameProvider>
-    </ThemeProvider>
+    <GameProvider>
+      <HomeContent />
+    </GameProvider>
   );
 };
 

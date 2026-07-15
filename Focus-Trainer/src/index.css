@@ -7,17 +7,85 @@
 }
 
 body {
-  background: black;
-  color: white;
-  height: 100vh;
-  overflow: hidden;
+  background: #000;
+  color: #fff;
   font-family:
-    system-ui,
-    -apple-system,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
     sans-serif;
 }
 
 #root {
+  min-height: 100vh;
+}
+
+/* Only Home page should have overflow hidden */
+.home-page {
   height: 100vh;
   overflow: hidden;
+}
+
+/* Stats and About pages should scroll */
+.scroll-page {
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Nav label responsiveness */
+.nav-label {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .nav-label {
+    display: inline;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animation keyframes */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Focus styles */
+input:focus {
+  outline: 2px solid rgba(76, 175, 80, 0.3);
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(76, 175, 80, 0.3);
+  color: #fff;
 }

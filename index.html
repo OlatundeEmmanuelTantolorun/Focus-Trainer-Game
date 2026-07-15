@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eye Focus Game</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: black;
+        color: white;
+        height: 100vh;
+        overflow: hidden;
+        font-family: system-ui, sans-serif;
+      }
+
+      .ball {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        background: #c9f29b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: bolder;
+        color: black;
+        box-shadow: 0 0 30px rgba(201, 242, 155, 0.6);
+        user-select: none;
+        transition:
+          box-shadow 0.4s ease,
+          background-color 0.4s ease;
+        will-change: transform;
+      }
+
+      .vibrate {
+        animation: vibrate 0.15s linear 3;
+      }
+
+      @keyframes vibrate {
+        0% {
+          transform: translate(
+            calc(var(--x, 100px) * 1px - 2px),
+            calc(var(--y, 100px) * 1px)
+          );
+        }
+        25% {
+          transform: translate(
+            calc(var(--x, 100px) * 1px + 2px),
+            calc(var(--y, 100px) * 1px)
+          );
+        }
+        50% {
+          transform: translate(
+            calc(var(--x, 100px) * 1px - 2px),
+            calc(var(--y, 100px) * 1px)
+          );
+        }
+        75% {
+          transform: translate(
+            calc(var(--x, 100px) * 1px + 2px),
+            calc(var(--y, 100px) * 1px)
+          );
+        }
+        100% {
+          transform: translate(
+            calc(var(--x, 100px) * 1px),
+            calc(var(--y, 100px) * 1px)
+          );
+        }
+      }
+
+      .ui {
+        position: fixed;
+        bottom: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      input {
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+      }
+
+      button {
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .score {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        font-size: 1rem;
+        transition:
+          transform 0.3s ease,
+          color 0.3s ease;
+      }
+
+      .high-score {
+        position: fixed;
+        top: 38px;
+        left: 15px;
+        font-size: 0.9rem;
+        color: #aaa;
+        transition: all 0.3s ease;
+      }
+
+      /* Animated state when breaking a record */
+      .high-score-beaten {
+        color: #ffcc00 !important;
+        text-shadow: 0 0 10px #ffcc00;
+        font-weight: bold;
+        transform: scale(1.1);
+        transform-origin: left top;
+      }
+
+      .timer {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+      }
+
+      /* ---------- NEW HIGHSCORE CELEBRATION OVERLAY ---------- */
+      #celebrationBanner {
+        position: fixed;
+        top: 15%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 204, 0, 0.2),
+          transparent
+        );
+        color: #ffcc00;
+        font-weight: 900;
+        font-size: 2rem;
+        letter-spacing: 4px;
+        padding: 10px 40px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 900;
+        text-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+      }
+
+      #celebrationBanner.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      /* ---------- START OVERLAY ---------- */
+      #startScreen {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
+
+      .startCircle {
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #d9ff9c, #9fdc6e);
+        color: #111;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="startScreen">
+      <div class="startCircle">
+        <h1>FOCUS TRAINER</h1>
+        <p>
+          A moving signal. A vanishing word.<br />
+          Track the motion. Hold the meaning.<br />
+          As speed rises and time thins, only focus carries you forward.
+        </p>
+        <button id="startBtn">START</button>
+      </div>
+    </div>
+
+    <div id="celebrationBanner">NEW HIGH SCORE!</div>
+
+    <div class="score">Score: <span id="score">0</span></div>
+    <div class="high-score" id="highScoreContainer">
+      High Score: <span id="highScore">0</span>
+    </div>
+    <div class="timer">Time: <span id="time">50</span>s</div>
+
+    <div class="ball" id="ball">READY?</div>
+
+    <div class="ui">
+      <input id="answer" placeholder="What did you see?" />
+      <button id="check">Check</button>
+    </div>
+
+    <script>
+      const ball = document.getElementById("ball");
+      const answerInput = document.getElementById("answer");
+      const scoreEl = document.getElementById("score");
+      const highScoreEl = document.getElementById("highScore");
+      const highScoreContainer = document.getElementById("highScoreContainer");
+      const celebrationBanner = document.getElementById("celebrationBanner");
+      const timeEl = document.getElementById("time");
+
+      let highScore = localStorage.getItem("focus_high_score")
+        ? parseInt(localStorage.getItem("focus_high_score"))
+        : 0;
+      highScoreEl.textContent = highScore;
+
+      let hasTriggeredCelebrationThisRun = false;
+
+      /* ---------- AUDIO POOL ---------- */
+      const bounceSounds = [];
+      const POOL_SIZE = 6;
+
+      for (let i = 0; i < POOL_SIZE; i++) {
+        const s = new Audio("pingPong.mp3");
+        s.volume = 0.25;
+        bounceSounds.push(s);
+      }
+
+      let soundIndex = 0;
+      let lastSoundTime = 0;
+
+      function playBounceSound() {
+        const now = performance.now();
+        if (now - lastSoundTime < 40) return;
+        lastSoundTime = now;
+
+        const sound = bounceSounds[soundIndex];
+        soundIndex = (soundIndex + 1) % POOL_SIZE;
+
+        sound.currentTime = 0;
+        sound.playbackRate = Math.min(2, Math.abs(vx + vy) / 10);
+        sound.play();
+      }
+
+      /* ---------- GAME ENGINE VARIABLES ---------- */
+      const words = [
+        "FOCUS",
+        "VISION",
+        "CLARITY",
+        "REACT",
+        "TRACK",
+        "SPEED",
+        "ALERT",
+        "FLOW",
+        "PRECISION",
+        "MEMORY",
+        "AWARE",
+        "SHARP",
+        "CALM",
+        "STEADY",
+        "CONTROL",
+        "REFLEX",
+        "TARGET",
+        "SIGNAL",
+        "BALANCE",
+        "INTENT",
+        "ENERGY",
+        "TIMING",
+        "RHYTHM",
+        "PATTERN",
+        "STABLE",
+        "DIRECT",
+        "INSIGHT",
+        "ACTIVE",
+        "ENGAGE",
+        "OBSERVE",
+        "FILTER",
+        "PROCESS",
+        "ADAPT",
+        "FORESIGHT",
+        "RESPONSE",
+        "FOCUSSED",
+        "ATTENTIVE",
+        "TRACKING",
+        "DECISION",
+        "ACCURACY",
+      ];
+
+      let score = 0;
+      let x = 100,
+        y = 100;
+      let vx = 4,
+        vy = 4;
+      let revealTime = 50;
+      let countdownInterval;
+      let gameStarted = false;
+      let currentWord = "";
+      let animationFrameId;
+      let lastColorChangeTime = 0;
+
+      function randomWord() {
+        return words[Math.floor(Math.random() * words.length)];
+      }
+
+      function startRound() {
+        clearInterval(countdownInterval);
+        currentWord = randomWord();
+        ball.textContent = currentWord;
+
+        let timeLeft = revealTime;
+        timeEl.textContent = timeLeft;
+        timeEl.style.color = "white";
+
+        countdownInterval = setInterval(() => {
+          timeLeft--;
+          timeEl.textContent = timeLeft;
+          if (timeLeft <= 10) timeEl.style.color = "#ff4d4d";
+          if (timeLeft === 0) {
+            clearInterval(countdownInterval);
+            ball.textContent = "TIME UP";
+            vx = 0;
+            vy = 0;
+            setTimeout(() => {
+              restartGame();
+            }, 1500);
+          }
+        }, 1000);
+      }
+
+      function randomRGB() {
+        const r = Math.floor(Math.random() * 210) + 45;
+        const g = Math.floor(Math.random() * 210) + 45;
+        const b = Math.floor(Math.random() * 210) + 45;
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+
+      function moveBall() {
+        if (!gameStarted) return;
+
+        const size = ball.offsetWidth || 120;
+        const maxX = window.innerWidth - size;
+        const maxY = window.innerHeight - size;
+
+        x += vx;
+        y += vy;
+
+        let bounced = false;
+
+        if (x <= 0) {
+          x = 0;
+          vx *= -1;
+          bounced = true;
+        }
+        if (x >= maxX) {
+          x = maxX;
+          vx *= -1;
+          bounced = true;
+        }
+        if (y <= 0) {
+          y = 0;
+          vy *= -1;
+          bounced = true;
+        }
+        if (y >= maxY) {
+          y = maxY;
+          vy *= -1;
+          bounced = true;
+        }
+
+        if (bounced) playBounceSound();
+
+        ball.style.transform = `translate(${x}px, ${y}px)`;
+
+        const now = performance.now();
+        if (now - lastColorChangeTime > 500) {
+          const color = randomRGB();
+          ball.style.backgroundColor = color;
+          ball.style.boxShadow = `0 0 45px ${color}`;
+          lastColorChangeTime = now;
+        }
+
+        animationFrameId = requestAnimationFrame(moveBall);
+      }
+
+      /* ---------- INPUT LISTENERS ---------- */
+      answerInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          document.getElementById("check").click();
+        }
+        if (event.key === "Escape") {
+          restartGame();
+        }
+      });
+
+      document.getElementById("check").onclick = () => {
+        const value = answerInput.value.trim().toUpperCase();
+        if (!value) return;
+
+        if (value === currentWord) {
+          score++;
+          scoreEl.textContent = score;
+
+          // Detect if we have crossed into a new record territory
+          if (score > highScore) {
+            highScore = score;
+            highScoreEl.textContent = highScore;
+            localStorage.setItem("focus_high_score", highScore);
+
+            // Apply hot golden style to the indicator panel
+            highScoreContainer.classList.add("high-score-beaten");
+
+            // Flash the banner once when the threshold is crossed
+            if (!hasTriggeredCelebrationThisRun) {
+              hasTriggeredCelebrationThisRun = true;
+              celebrationBanner.classList.add("show");
+              setTimeout(() => {
+                celebrationBanner.classList.remove("show");
+              }, 2000);
+            }
+          }
+
+          vx *= 1.15;
+          vy *= 1.15;
+          revealTime = Math.max(6, revealTime - 2);
+          startRound();
+        } else {
+          ball.style.setProperty("--x", x);
+          ball.style.setProperty("--y", y);
+          ball.classList.add("vibrate");
+          setTimeout(() => ball.classList.remove("vibrate"), 300);
+        }
+
+        answerInput.value = "";
+      };
+
+      document.getElementById("startBtn").onclick = () => {
+        document.getElementById("startScreen").style.display = "none";
+        gameStarted = true;
+        startRound();
+        moveBall();
+        answerInput.focus();
+      };
+
+      function restartGame() {
+        clearInterval(countdownInterval);
+        cancelAnimationFrame(animationFrameId);
+
+        score = 0;
+        x = 100;
+        y = 100;
+        vx = 4;
+        vy = 4;
+        revealTime = 50;
+        gameStarted = false;
+        currentWord = "";
+        hasTriggeredCelebrationThisRun = false;
+
+        scoreEl.textContent = score;
+        timeEl.textContent = revealTime;
+        timeEl.style.color = "white";
+        ball.textContent = "READY?";
+        answerInput.value = "";
+        ball.style.transform = `translate(${x}px, ${y}px)`;
+
+        // Remove high score glowing style on fresh reset
+        highScoreContainer.classList.remove("high-score-beaten");
+        celebrationBanner.classList.remove("show");
+
+        document.getElementById("startScreen").style.display = "flex";
+      }
+    </script>
+  </body>
+</html>

@@ -18,20 +18,17 @@ body {
   min-height: 100vh;
 }
 
-/* Only Home page should have overflow hidden */
 .home-page {
   height: 100vh;
   overflow: hidden;
 }
 
-/* Stats and About pages should scroll */
 .scroll-page {
   height: auto;
   min-height: 100vh;
   overflow-y: auto;
 }
 
-/* Nav label responsiveness */
 .nav-label {
   display: none;
 }
@@ -42,7 +39,6 @@ body {
   }
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
 }

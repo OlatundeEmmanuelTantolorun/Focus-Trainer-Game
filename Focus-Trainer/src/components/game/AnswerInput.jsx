@@ -14,10 +14,10 @@ const AnswerInput = () => {
   useEffect(() => {
     if (isGameStarted && inputRef.current) {
       inputRef.current.focus();
-      // Keep keyboard up on mobile
+
       inputRef.current.click();
     }
-  }, [isGameStarted, currentWord]); // Now currentWord is defined
+  }, [isGameStarted, currentWord]);
 
   const handleSubmit = () => {
     if (!answer.trim()) return;

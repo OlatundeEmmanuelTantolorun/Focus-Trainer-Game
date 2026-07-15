@@ -6,7 +6,6 @@ import { FaTrophy } from "react-icons/fa";
 const Celebration = () => {
   const { showBanner } = useGame();
 
-  // Create confetti particles
   const confettiColors = [
     "#ff6b6b",
     "#ffd93d",

@@ -14,7 +14,7 @@ export const useAudioPool = () => {
         const sound = new Audio("/pingPong.mp3");
         sound.volume = 0.25;
         sound.preload = "auto";
-        // Add error handling for each sound
+
         sound.addEventListener("error", (e) => {
           console.warn("Sound failed to load:", e);
         });
@@ -41,16 +41,13 @@ export const useAudioPool = () => {
 
       soundIndexRef.current = (soundIndexRef.current + 1) % POOL_SIZE;
 
-      // Reset and play
       sound.currentTime = 0;
       const speed = Math.abs(vx) + Math.abs(vy);
       sound.playbackRate = Math.min(2, speed / 10);
 
-      // Play with error handling
       const playPromise = sound.play();
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
-          // Auto-play was prevented or sound failed
           console.debug("Sound play prevented:", error);
         });
       }

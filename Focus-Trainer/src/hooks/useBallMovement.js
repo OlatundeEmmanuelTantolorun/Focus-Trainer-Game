@@ -42,7 +42,6 @@ export const useBallMovement = (isGameStarted, playBounceSound) => {
         bounced = true;
       }
       if (newY <= 60) {
-        // Account for navbar
         newY = 60;
         newVy *= -1;
         bounced = true;
@@ -56,7 +55,6 @@ export const useBallMovement = (isGameStarted, playBounceSound) => {
       if (bounced) {
         setVelocity({ vx: newVx, vy: newVy });
 
-        // Play sound on bounce
         if (playBounceSound) {
           const now = performance.now();
           // Prevent too many sounds in quick succession

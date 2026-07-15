@@ -35,9 +35,8 @@ export const GameProvider = ({ children }) => {
   const [showBanner, setShowBanner] = useState(false);
 
   const { highScore, updateHighScore } = useLocalStorage();
-  const playBounceSound = useAudioPool(); // Get the sound function
+  const playBounceSound = useAudioPool();
 
-  // Pass the sound function to useBallMovement
   const { position, color, shadow, increaseSpeed, resetBall, setVelocity } =
     useBallMovement(isGameStarted, playBounceSound);
 

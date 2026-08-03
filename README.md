@@ -12,8 +12,8 @@ https://eyefocus-trainer.netlify.app/
 ---
 
 ## 📸 Preview
+<img width="1333" height="1999" alt="screenshot" src="https://github.com/user-attachments/assets/ea2bd9f0-499a-4521-b2fa-0ce4e288211f" />
 
-![Focus Trainer Screenshot](./screenshot.png)
 
 ---
 

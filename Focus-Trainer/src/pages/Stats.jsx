@@ -52,7 +52,7 @@ export default function Stats() {
   }
 
   const pageStyle = {
-    hbeight: "100vh",
+    height: "100vh",
     padding: "24px 20px 90px",
     background: isDark
       ? "radial-gradient(circle at 20% 30%, #1a1a1a 0%, #0d0d0d 100%)"

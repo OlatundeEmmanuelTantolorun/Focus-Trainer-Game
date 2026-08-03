@@ -1,138 +1,294 @@
-import React from "react";
-import { GameProvider } from "../context/GameContext";
-import Navbar from "../components/layout/Navbar";
-import Card from "../components/ui/Card";
-import { useTheme } from "../context/ThemeContext";
-import { useGame } from "../context/GameContext";
 import { motion } from "framer-motion";
+import { useGame } from "../context/GameContext";
 import {
-  FaTrophy,
   FaGamepad,
-  FaClock,
-  FaStar,
+  FaTrophy,
   FaChartLine,
+  FaBullseye,
+  FaClock,
+  FaHourglassHalf,
+  FaFire,
+  FaKeyboard,
+  FaRegCalendarCheck,
+  FaFont,
 } from "react-icons/fa";
 
-import { FiTarget } from "react-icons/fi";
+export default function Stats() {
+  const { data } = useGame();
+  const isDark = data.theme === "dark";
 
-const StatsContent = () => {
-  const { colors } = useTheme();
-  const { highScore } = useGame();
+  const average =
+    data.gamesPlayed === 0
+      ? 0
+      : (data.totalScore / data.gamesPlayed).toFixed(1);
 
-  const stats = {
-    gamesPlayed: 42,
-    highestScore: highScore,
-    averageScore: 15,
-    bestAccuracy: 87,
-    fastestCompletion: 3.2,
-    timePlayed: 126,
+  function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    if (h === 0 && m === 0) return `${s}s`;
+    if (h === 0) return `${m}m ${s}s`;
+    return `${h}h ${m}m`;
+  }
+
+  function formatLastPlayed(iso) {
+    if (!iso) return "Never";
+    const date = new Date(iso);
+    const now = new Date();
+
+    if (date.toDateString() === now.toDateString()) {
+      return `Today, ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  const pageStyle = {
+    hbeight: "100vh",
+    padding: "24px 20px 90px",
+    background: isDark
+      ? "radial-gradient(circle at 20% 30%, #1a1a1a 0%, #0d0d0d 100%)"
+      : "radial-gradient(circle at 20% 30%, #f0f2f5 0%, #e0e5ed 100%)",
+    color: isDark ? "#f0f0f0" : "#1a1a1a",
+    overflowY: "auto",
+    fontFamily: "'Inter', system-ui, sans-serif",
   };
 
-  const statItems = [
-    { icon: FaGamepad, label: "Games Played", value: stats.gamesPlayed },
-    { icon: FaTrophy, label: "Highest Score", value: stats.highestScore },
-    { icon: FaChartLine, label: "Average Score", value: stats.averageScore },
-    { icon: FiTarget, label: "Best Accuracy", value: `${stats.bestAccuracy}%` },
-    {
-      icon: FaClock,
-      label: "Fastest Completion",
-      value: `${stats.fastestCompletion}s`,
-    },
-    { icon: FaStar, label: "Time Played", value: `${stats.timePlayed}m` },
-  ];
+  const headerStyle = {
+    marginBottom: 28,
+    paddingBottom: 16,
+    borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`,
+  };
+
+  const titleStyle = {
+    fontSize: "clamp(1.6rem, 5vw, 2.2rem)",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    background: "linear-gradient(135deg, #c9f29b, #8fcf5a)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    margin: 0,
+  };
+
+  const subtitleStyle = {
+    fontSize: "0.9rem",
+    color: isDark ? "#888" : "#666",
+    fontWeight: 400,
+    marginTop: 4,
+  };
+
+  const sectionLabelStyle = {
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "1.6px",
+    fontWeight: 700,
+    color: isDark ? "#7d8177" : "#8a8f80",
+    margin: "0 0 10px 2px",
+  };
+
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: 14,
+    marginBottom: 26,
+  };
+
+  const heroGridStyle = {
+    ...gridStyle,
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+  };
+
+  const cardStyle = {
+    background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.5)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"}`,
+    padding: "18px 14px",
+    borderRadius: 16,
+    textAlign: "center",
+    boxShadow: isDark
+      ? "0 8px 24px rgba(0,0,0,0.3)"
+      : "0 8px 24px rgba(0,0,0,0.06)",
+  };
+
+  const iconStyle = {
+    fontSize: "1.6rem",
+    marginBottom: 6,
+    color: isDark ? "#c9f29b" : "#3a7a2a",
+    opacity: 0.85,
+  };
+
+  const labelStyle = {
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.6px",
+    color: isDark ? "#aaa" : "#777",
+    fontWeight: 600,
+    marginBottom: 4,
+  };
+
+  const valueStyle = {
+    fontSize: "clamp(1.6rem, 4vw, 2.2rem)",
+    fontWeight: 600,
+    fontFamily: "'JetBrains Mono', 'Menlo', monospace",
+    letterSpacing: "-0.5px",
+    lineHeight: 1.2,
+    color: isDark ? "#fff" : "#111",
+  };
+
+  const smallValueStyle = {
+    ...valueStyle,
+    fontSize: "clamp(1.2rem, 3vw, 1.6rem)",
+  };
+
+  const highlightValue = {
+    ...valueStyle,
+    color: "#c9f29b",
+  };
+
+  const footerStyle = {
+    textAlign: "center",
+    marginTop: 6,
+    color: isDark ? "#666" : "#999",
+    fontSize: "0.85rem",
+    fontWeight: 500,
+  };
+
+  const streakActive = data.currentStreak > 0;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        height: "auto",
-        overflowY: "auto",
-        background: colors.background,
-        color: colors.text,
-      }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={pageStyle}
     >
-      <Navbar />
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "80px 20px 40px",
-        }}
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            fontSize: "2.5rem",
-            marginBottom: "2rem",
-            textAlign: "center",
-          }}
-        >
-          Your Stats
-        </motion.h1>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "20px",
-            marginBottom: "40px",
-          }}
-        >
-          {statItems.map((item, index) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "15px",
-                    padding: "10px",
-                  }}
-                >
-                  <item.icon size={32} color={colors.highlight || "#ffcc00"} />
-                  <div>
-                    <div style={{ fontSize: "0.9rem", opacity: 0.7 }}>
-                      {item.label}
-                    </div>
-                    <div style={{ fontSize: "1.8rem", fontWeight: "bold" }}>
-                      {item.value}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          style={{ textAlign: "center", marginTop: "40px" }}
-        >
-          <Card>
-            <p style={{ fontSize: "1.1rem", padding: "20px" }}>
-              Keep playing to improve your stats! Every game makes you sharper.
-            </p>
-          </Card>
-        </motion.div>
+      <div style={headerStyle}>
+        <h1 style={titleStyle}>Your Stats</h1>
+        <p style={subtitleStyle}>Track your focus journey</p>
       </div>
-    </div>
-  );
-};
 
-const Stats = () => {
-  return (
-    <GameProvider>
-      <StatsContent />
-    </GameProvider>
-  );
-};
+      <div style={heroGridStyle}>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaGamepad />
+          </div>
+          <div style={labelStyle}>Games Played</div>
+          <div style={valueStyle}>{data.gamesPlayed}</div>
+        </div>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaTrophy />
+          </div>
+          <div style={labelStyle}>Highest Score</div>
+          <div style={highlightValue}>{data.highScore}</div>
+        </div>
+      </div>
 
-export default Stats;
+      <p style={sectionLabelStyle}>Performance</p>
+      <div style={gridStyle}>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaChartLine />
+          </div>
+          <div style={labelStyle}>Average Score</div>
+          <div style={smallValueStyle}>{average}</div>
+        </div>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaBullseye />
+          </div>
+          <div style={labelStyle}>Best Accuracy</div>
+          <div style={smallValueStyle}>{data.bestAccuracy}%</div>
+        </div>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaFont />
+          </div>
+          <div style={labelStyle}>Longest Word</div>
+          <div style={smallValueStyle}>
+            {data.longestWordAnswered ? `${data.longestWordAnswered}` : "—"}
+          </div>
+        </div>
+      </div>
+
+      <p style={sectionLabelStyle}>Speed</p>
+      <div style={gridStyle}>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaClock />
+          </div>
+          <div style={labelStyle}>Fastest Answer</div>
+          <div style={smallValueStyle}>
+            {data.fastestAnswer === 0 ? "—" : `${data.fastestAnswer}s`}
+          </div>
+        </div>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaKeyboard />
+          </div>
+          <div style={labelStyle}>Best WPM</div>
+          <div style={smallValueStyle}>{data.bestWPM ? data.bestWPM : "—"}</div>
+        </div>
+      </div>
+
+      <p style={sectionLabelStyle}>Streaks</p>
+      <div style={gridStyle}>
+        <div style={cardStyle}>
+          <div
+            style={{
+              ...iconStyle,
+              color: streakActive ? "#ff9f43" : iconStyle.color,
+              opacity: streakActive ? 1 : 0.5,
+            }}
+          >
+            <FaFire />
+          </div>
+          <div style={labelStyle}>Current Streak</div>
+          <div style={smallValueStyle}>{data.currentStreak || 0}</div>
+        </div>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaFire />
+          </div>
+          <div style={labelStyle}>Best Streak</div>
+          <div style={smallValueStyle}>{data.bestStreak || 0}</div>
+        </div>
+      </div>
+
+      <p style={sectionLabelStyle}>Activity</p>
+      <div style={gridStyle}>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaHourglassHalf />
+          </div>
+          <div style={labelStyle}>Time Played</div>
+          <div style={smallValueStyle}>{formatTime(data.timePlayed)}</div>
+        </div>
+        <div style={cardStyle}>
+          <div style={iconStyle}>
+            <FaRegCalendarCheck />
+          </div>
+          <div style={labelStyle}>Last Played</div>
+          <div
+            style={{
+              ...smallValueStyle,
+              fontSize: "clamp(0.95rem, 2.4vw, 1.15rem)",
+            }}
+          >
+            {formatLastPlayed(data.lastPlayed)}
+          </div>
+        </div>
+      </div>
+
+      <p style={footerStyle}>Keep playing to improve your focus. 🎯</p>
+    </motion.div>
+  );
+}

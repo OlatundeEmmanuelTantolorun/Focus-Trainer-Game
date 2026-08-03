@@ -1,10 +1,10 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGame } from "../../context/GameContext";
-import { FaTrophy } from "react-icons/fa";
+import { useGame } from "../context/GameContext";
 
 const Celebration = () => {
-  const { showBanner } = useGame();
+  const { data } = useGame();
+  const { showBanner } = data;
 
   const confettiColors = [
     "#ff6b6b",
@@ -12,16 +12,23 @@ const Celebration = () => {
     "#6bcb77",
     "#4d96ff",
     "#ff6bff",
+    "#ff9f43",
+    "#00d2d3",
+    "#f368e0",
+    "#54a0ff",
+    "#5f27cd",
   ];
-  const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
+
+  const confettiPieces = Array.from({ length: 80 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
     color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-    size: Math.random() * 8 + 4,
+    size: Math.random() * 10 + 4,
     rotation: Math.random() * 360,
-    duration: Math.random() * 2 + 1,
+    duration: Math.random() * 2 + 1.5,
     delay: Math.random() * 0.5,
+    xDrift: (Math.random() - 0.5) * 300,
   }));
 
   return (
@@ -57,15 +64,19 @@ const Celebration = () => {
                 repeat: Infinity,
                 repeatType: "loop",
               }}
-              style={{ fontSize: "4rem", marginBottom: "10px" }}
+              style={{
+                fontSize: "clamp(3rem, 10vw, 5rem)",
+                marginBottom: "10px",
+              }}
             >
               🏆
             </motion.div>
             <motion.h1
               style={{
-                fontSize: "3rem",
+                fontSize: "clamp(1.8rem, 6vw, 3.5rem)",
                 fontWeight: 900,
-                background: "linear-gradient(135deg, #ffcc00, #ff8800)",
+                background:
+                  "linear-gradient(135deg, #ffcc00, #ff8800, #ff4400)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 textShadow: "0 0 30px rgba(255,204,0,0.3)",
@@ -80,11 +91,23 @@ const Celebration = () => {
                 repeatType: "loop",
               }}
             >
-              NEW HIGH SCORE!
+              NEW HIGH SCORE! 🎉
             </motion.h1>
+            <motion.p
+              style={{
+                color: "#fff",
+                fontSize: "clamp(1rem, 3vw, 1.5rem)",
+                marginTop: 10,
+                opacity: 0.8,
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              Amazing! You're getting sharper!
+            </motion.p>
           </motion.div>
 
-          {/* Confetti */}
           {confettiPieces.map((piece) => (
             <motion.div
               key={piece.id}
@@ -107,9 +130,9 @@ const Celebration = () => {
               }}
               animate={{
                 y: ["0vh", "100vh"],
-                rotate: [0, piece.rotation * 2],
+                rotate: [0, piece.rotation * 3],
                 opacity: [1, 0],
-                x: [0, (Math.random() - 0.5) * 200],
+                x: [0, piece.xDrift],
               }}
               transition={{
                 duration: piece.duration,

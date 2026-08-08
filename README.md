@@ -110,7 +110,7 @@ git clone https://github.com/OlatundeEmmanuelTantolorun/Focus-Trainer-Game.git
 Navigate into the project.
 
 ```bash
-cd focus-trainer
+cd Focus-Trainer-Game/Focus-Trainer
 ```
 
 Install dependencies.
